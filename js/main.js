@@ -1,7 +1,7 @@
 "use strict";
 /*
  * Laboration 5 - Studentkortsgenerator
- * Namn: DITT NAMN
+ * Namn: Eliza Hadlowska
  */
 
 // Hämta element från DOM
@@ -21,6 +21,32 @@ const errorList = document.querySelector("#errorlist");
 const historySection = document.querySelector("#history");
 const deleteHistoryButton = document.querySelector("#delete");
 
+const generate = document.getElementById("generate");
+
+//Knapparna på sidan gör att inte hela sidan laddas om
+//Generera studentkort-knapp
+generate.addEventListener('click', function (event) {
+    event.preventDefault();
+}) 
+
+//Rensa-knapp
+clearButton.addEventListener('click', function (event) {
+    event.preventDefault();
+})
+
+//Rensa historik-knapp
+deleteHistoryButton.addEventListener('click', function (event) {
+    event.preventDefault();
+})
+
+form.addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    alert('Hej ' + fullnameInput.value);
+});
+
+
+console.log("Start av applikation...");
 
 // Array som används för felmeddelanden
 let errors = [];
