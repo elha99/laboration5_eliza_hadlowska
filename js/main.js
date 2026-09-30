@@ -44,27 +44,38 @@ form.addEventListener('submit', (event) => {
     const email = emailInput.value.trim();
     const phone = phoneInput.value.trim();
 
-    //Kontrollera att namn,email och telefon fälten är ifyllda, om ej genereras det ett felmeddelande
+// Array som används för felmeddelanden
+    let errors = [];
+
+//Rensa tidigare meddelanden
+    errorList.innerHTML = "";
+
+//Kontrollera att namn,email och telefon fälten är ifyllda, om ej genereras det ett felmeddelande
     if (fullname === "") {
-        errorList.textContent = "Du måste ange ditt fullständiga namn";
-        return;
-    }
+    errors.push("Du måste ange ditt fullständiga namn");
+    } 
+
 
     if (email === "") {
-        errorList.textContent = "Du måste ange din e-postadress";
-        return;
+    errors.push("Du måste ange din e-postadress");
     }
 
     if (phone === "") {
-        errorList.textContent = "Du måste ange ditt telefonnummer";
-        return;
+    errors.push("Du måste ange ditt telefonnummer");
     }
 
-    errorList.textContent = "";
+//Visar hur många fel det handlar om och för varje skapar den ett li element
+    if (errors.length > 0) {
+    errors.forEach(function(message) {
+    const li = document.createElement('li');
+    li.textContent = message;
+
+//li elementet kommer att ingå i ul errorList i HTML-filen
+    errorList.appendChild(li);
+    })
+}
 });
 
-// Array som används för felmeddelanden
-let errors = [];
 
 // Array som innehåller sparade studentkort
 let history = [];
