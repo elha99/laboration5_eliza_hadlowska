@@ -21,32 +21,47 @@ const errorList = document.querySelector("#errorlist");
 const historySection = document.querySelector("#history");
 const deleteHistoryButton = document.querySelector("#delete");
 
-const generate = document.getElementById("generate");
-
-//Knapparna på sidan gör att inte hela sidan laddas om
-//Generera studentkort-knapp
-generate.addEventListener('click', function (event) {
-    event.preventDefault();
-}) 
-
 //Rensa-knapp
 clearButton.addEventListener('click', function (event) {
     event.preventDefault();
+    fullnameInput.value = '';
+    emailInput.value = '';
+    phoneInput.value = '';
+    
 })
 
-//Rensa historik-knapp
+//Rensa historik-knapp MÅSTE TESTAS
 deleteHistoryButton.addEventListener('click', function (event) {
     event.preventDefault();
 })
 
+//Formuläret
 form.addEventListener('submit', (event) => {
     event.preventDefault();
 
-    alert('Hej ' + fullnameInput.value);
+    //Inhämta värden från fälten och ta bort mellanslagen med trim()
+    const fullname = fullnameInput.value.trim();
+    const email = emailInput.value.trim();
+    const phone = phoneInput.value.trim();
+
+    //Kontrollera att namn,email och telefon fälten är ifyllda, om ej genereras det ett felmeddelande
+    if (fullname === "") {
+        errorList.textContent = "Du måste ange ditt fullständiga namn";
+        return;
+    }
+
+    if (email === "") {
+        errorList.textContent = "Du måste ange din e-postadress";
+        return;
+    }
+
+    if (phone === "") {
+        errorList.textContent = "Du måste ange ditt telefonnummer";
+        return;
+    }
+
+    errorList.textContent = "";
 });
-
-
-console.log("Start av applikation...");
 
 // Array som används för felmeddelanden
 let errors = [];
