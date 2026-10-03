@@ -21,46 +21,61 @@ const errorList = document.querySelector("#errorlist");
 const historySection = document.querySelector("#history");
 const deleteHistoryButton = document.querySelector("#delete");
 
-//Rensa-knapp
-clearButton.addEventListener('click', function (event) {
-    event.preventDefault();
-    fullnameInput.value = '';
-    emailInput.value = '';
-    phoneInput.value = '';
-    
-})
-
-//Rensa historik-knapp MÅSTE TESTAS
-deleteHistoryButton.addEventListener('click', function (event) {
-    event.preventDefault();
-})
+clearButton.addEventListener('click', clearForm)
+deleteHistoryButton.addEventListener('click', deleteHistory)
 
 //Formuläret
-form.addEventListener('submit', (event) => {
+form.addEventListener('submit', validateForm) 
+    
+// if (!email.includes("@")) {
+//     errors.push("E-postadressen måste innehålla ett @-tecken");
+// }
+
+// Array som innehåller sparade studentkort
+let history = [];
+
+/**
+ * Validerar formulärets inmatning.
+ * @returns {boolean}
+ */
+function validateForm(event) {
+    // Kontrollera formulärets obligatoriska fält
+
+    // Visa eventuella felmeddelanden
+
+    // Returnera resultatet (true eller false) av valideringen
     event.preventDefault();
 
-    //Inhämta värden från fälten och ta bort mellanslagen med trim()
-    const fullname = fullnameInput.value.trim();
-    const email = emailInput.value.trim();
-    const phone = phoneInput.value.trim();
+    displayErrors();
 
-// Array som används för felmeddelanden
-    let errors = [];
+    createStudentCard();
 
-//Rensa tidigare meddelanden
+    clearForm();
+}
+
+
+/**
+ * Visar felmeddelanden på sidan.
+ */
+function displayErrors() {
+    // Rensa tidigare felmeddelanden
     errorList.innerHTML = "";
 
+    // Skriv ut aktuella felmeddelanden till DOM
+
+    // Array som används för felmeddelanden
+    let errors = [];
+
 //Kontrollera att namn,email och telefon fälten är ifyllda, om ej genereras det ett felmeddelande
-    if (fullname === "") {
+    if (fullnameInput === "") {
     errors.push("Du måste ange ditt fullständiga namn");
     } 
 
-
-    if (email === "") {
+    if (emailInput === "") {
     errors.push("Du måste ange din e-postadress");
     }
 
-    if (phone === "") {
+    if (phoneInput === "") {
     errors.push("Du måste ange ditt telefonnummer");
     }
 
@@ -73,33 +88,7 @@ form.addEventListener('submit', (event) => {
 //li elementet kommer att ingå i ul errorList i HTML-filen
     errorList.appendChild(li);
     })
-}
-});
-
-
-// Array som innehåller sparade studentkort
-let history = [];
-
-/**
- * Validerar formulärets inmatning.
- * @returns {boolean}
- */
-function validateForm() {
-    // Kontrollera formulärets obligatoriska fält
-
-    // Visa eventuella felmeddelanden
-
-    // Returnera resultatet (true eller false) av valideringen
-}
-
-
-/**
- * Visar felmeddelanden på sidan.
- */
-function displayErrors() {
-    // Rensa tidigare felmeddelanden
-
-    // Skriv ut aktuella felmeddelanden till DOM
+    }
 }
 
 
@@ -107,13 +96,22 @@ function displayErrors() {
  * Skapar ett studentkort och visar det på sidan.
  */
 function createStudentCard() {
-    // Hämta information från formuläret
+
+    //Inhämta värden från formuläret och ta bort mellanslagen med trim()
+    const fullname = fullnameInput.value.trim();
+    const email = emailInput.value.trim();
+    const phone = phoneInput.value.trim();
 
     // Uppdatera studentkortet
+    previewFullname.textContent = `${fullname}`
+    previewEmail.innerHTML = `${email}`
+    previewPhone.innerHTML = `${phone}`
 
     // Lägg till studentkortet i historiken
+    historySection.innerHTML = `Namn: ${fullname} <br> E-postadress: ${email} <br> Telefonnummer: ${phone}`
 
     // Spara och uppdatera historiken
+
 }
 
 
@@ -152,7 +150,15 @@ function clearForm() {
     // Återställ formulär och studentkort
 
     // Rensa eventuella felmeddelanden
+
+    //Rensa-knapp
+
+    fullnameInput.value = "";
+    emailInput.value = "";
+    phoneInput.value = "";
+    
 }
+
 
 
 /**
@@ -160,7 +166,7 @@ function clearForm() {
  */
 function deleteHistory() {
     // Radera sparad historik
-
+    historySection.innerHTML = "";
     // Uppdatera history och visningen på sidan
 }
 
