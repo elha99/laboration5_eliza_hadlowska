@@ -21,149 +21,160 @@ const errorList = document.querySelector("#errorlist");
 const historySection = document.querySelector("#history");
 const deleteHistoryButton = document.querySelector("#delete");
 
-clearButton.addEventListener('click', clearForm)
-deleteHistoryButton.addEventListener('click', deleteHistory)
+form.addEventListener("submit", onSubmit)
+clearButton.addEventListener("click", clearForm)
+deleteHistoryButton.addEventListener("click", deleteHistory)
+
+//Läsa in värden som skrivs in i fälten
+const fullname = fullnameInput.value.trim();
+const email = emailInput.value.trim();
+const phone = phoneInput.value.trim();
 
 // Array som används för felmeddelanden
 let errors = [];
 
+//Array som används för historiken
 let history = [];
 
-//Formuläret
-form.addEventListener('submit', function(event) {
+//Eventlyssnaren för formuläret
+function onSubmit(event) {
     event.preventDefault();
 
-    if(validateForm()) {
-    errorList.innerHTML = "";
-    createStudentCard();
+    if(!validateForm()) {
+        displayErrors();
     } else {
-    displayErrors()
+        createStudentCard();
     }
 
-    clearForm()
-    });
+    clearForm();
 
+    };
+
+//Validera formuläret
 function validateForm() {
     
-    // Kontrollera formulärets obligatoriska fält
-
-    // Visa eventuella felmeddelanden
-
-    // Returnera resultatet (true eller false) av valideringen
-
-    // Rensa tidigare felmeddelanden
+    //Rensa tidigare felmeddelanden och arrayen
+    errors = [];
     errorList.innerHTML = "";
+    
+    //Variabel som kolla efter fel
+    let validate = false;
 
-    // Skriv ut aktuella felmeddelanden till DOM
-
-    const fullname = fullnameInput.value.trim();
-    const email = emailInput.value.trim();
-    const phone = phoneInput.value.trim();
-
-//Kontrollera att namn,email och telefon fälten är ifyllda, om ej genereras det ett felmeddelande
+    //Validera de tre olika fälten
     if (fullname === "") {
-    errors.push("Du måste ange ditt fullständiga namn");
+        errors.push("Du måste ange ditt fullständiga namn");
+        validate = false;
     } 
 
     if (email === "") {
-    errors.push("Du måste ange din e-postadress");
+        errors.push("Du måste ange din e-postadress");
+        validate = false;
     }
 
     if (phone === "") {
-    errors.push("Du måste ange ditt telefonnummer");
-    }
-    
-    if (errors.length > 0) {
-        return false;
-    } else {
-        return true;
+        errors.push("Du måste ange ditt telefonnummer");
+        validate = false;
     }
 
+    // Returnera resultatet av valideringen
+    return validate;
 }
 
-
-/**
- * Visar felmeddelanden på sidan.
- */
+//Visar felmeddelanden på sidan
 function displayErrors() {
 
-    errorList.innerHTML = "";
-
+    //För varje felmeddelande skapas ett li-element
     if (errors.length > 0) {
-        errors.forEach(function(message) {
-        const liEl = document.createElement('li');
-        liEl.textContent = message;
-
-//li elementet kommer att ingå i ul errorList i HTML-filen
+        for(let i = 0; i < errors.length; i++) {
+            const liEl = document.createElement("li");
+            liEl.innerHTML = errors[i];
+        
+        //li elementet kommer att ingå i ul errorList i HTML-filen
         errorList.appendChild(liEl);
-        })
+        }
     }
-//Visar hur många fel det handlar om och för varje skapar den ett li element
-
 }
 
-/**
- * Skapar ett studentkort och visar det på sidan.
- */
+//Skapar ett studentkort och visar det på sidan
 function createStudentCard() {
 
-    //Inhämta värden från formuläret och ta bort mellanslagen med trim()
-    const fullname = fullnameInput.value.trim();
-    const email = emailInput.value.trim();
-    const phone = phoneInput.value.trim();
+/*     const font = fontSelect.value;
+    font.style.fontFamily = font;*/
 
+/*     const previewSection = document.querySelector("#preview"); */
+
+    //Uppdatera studentkortet
+/*     let fullname = previewFullname.value;
+    let email = previewEmail.value;
+    let phone = previewPhone.value; */
+
+    previewFullname.innerHTML = `Namn: ${fullname}`
+    previewEmail.innerHTML = `E-post: ${email}`
+    previewPhone.innerHTML = `Telefon: ${phone}`
+
+ /*    previewSection.innerHTML = `Namn: ${fullname} <br> Email: ${email} <br> Telefon: ${phone}` */
+
+    //Studentkort som ett objekt som ska läggas in i historiken
+    const studentCard = {
+        fullname: fullname,
+        email: email,
+        phone: phone,
+/*         fontSelect: font */
+    }
 
     
-    // Uppdatera studentkortet
-    previewFullname.innerHTML = `${fullname}`
-    previewEmail.innerHTML = `${email}`
-    previewPhone.innerHTML = `${phone}`
 
-    previewFullname.style.fontFamily = fontSelect;
-    previewEmail.style.fontFamily = fontSelect;
-    previewPhone.style.fontFamily = fontSelect;
-
-    // Lägg till studentkortet i historiken
- /*    const studentCard = {
-        fullname.unshift() 
-    } */
-    historySection.innerHTML = `Namn: ${fullname} <br> Email: ${email} <br> Telefon: ${phone} <br> Font: ${fontSelect}`
-
-    // Spara och uppdatera historiken
-    // Array som innehåller sparade studentkort
-
-    history.unshift(historySection);
-
-/*       if (errors.length > 0) {
-        errors.forEach(function(message) {
-        const liEl = document.createElement('li');
-        liEl.textContent = message;
-
-//li elementet kommer att ingå i ul errorList i HTML-filen
-        errorList.appendChild(liEl);
-        }) */
+    historySection.unshift(studentCard);
 
 }
 
 
-/**
- * Sparar historiken i localStorage.
- */
+
+//Sparar historiken i localStorage.
 function saveHistory() {
-    // Spara history i localStorage
-/*     JSON.stringify(history)
-    localStorage.setItem() */
+    // Spara historik i localStorage
+    const studentsJson = JSON.stringify(students);
+    localStorage.setItem("students", studentsJson);
+
+    const localStorageData = localStorage.getItem("students");
+
+    const students = JSON.parse(localStorageData);
+    if(students === null) {
+        students = [];
+    }
+    students.push(studentCard)
 }
 
 
-/**
- * Läser in tidigare historik från localStorage.
- */
+
+//Läser in tidigare historik från localStorage.
 function loadHistory() {
     // Hämta eventuell sparad historik
-/* localStorage.getItem("nyckel");
-JSON.parse() */
+    const localStorageData = localStorage.getItem("students");
+    
     // Uppdatera history
+    const students = JSON.parse(localStorageData);
+    if(students === null) {
+        students = [];
+    }
+
+    if(students.length === 0) {
+        return
+    }
+
+    for(let i = 0; i < students.length; i++) {
+        const sectionEl = document.createElement("section");
+
+        const pEl = dokument.createElement("p");
+        pEl.innerHTML = `Namn: ${students[i].fullname}
+        <br>
+        E-post: ${students[i].email}
+        <br>
+        Telefon: ${students[i].phone}`;
+
+        sectionEl.appendChild(pEl);
+        historySection.appendChild(sectionEl);
+    }
 }
 
 
@@ -182,6 +193,8 @@ function renderHistory() {
  */
 function clearForm() {
 
+    errors = [];
+    errorList.innerHTML = "";
     fullnameInput.value = "";
     emailInput.value = "";
     phoneInput.value = "";
