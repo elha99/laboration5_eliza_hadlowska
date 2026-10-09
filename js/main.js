@@ -25,11 +25,6 @@ form.addEventListener("submit", onSubmit)
 clearButton.addEventListener("click", clearForm)
 deleteHistoryButton.addEventListener("click", deleteHistory)
 
-//Läsa in värden som skrivs in i fälten
-const fullname = fullnameInput.value.trim();
-const email = emailInput.value.trim();
-const phone = phoneInput.value.trim();
-
 // Array som används för felmeddelanden
 let errors = [];
 
@@ -40,22 +35,29 @@ let history = [];
 function onSubmit(event) {
     event.preventDefault();
 
-    if(!validateForm()) {
+    //Läsa in värden som skrivs in i fälten
+    const fullname = fullnameInput.value.trim();
+    const email = emailInput.value.trim();
+    const phone = phoneInput.value.trim();
+
+    //Om formuläret inte fyllts i korrekt ska felmeddelanden visas
+    if(!validateForm(fullname, email, phone)) {
         displayErrors();
     } else {
-        createStudentCard();
+        //annars skapas studentkortet och formuläret rensas
+        createStudentCard(fullname, email, phone);
         clearForm();
     }
     };
 
 //Validera formuläret
-function validateForm() {
+function validateForm(fullname, email, phone) {
     
     //Rensa tidigare felmeddelanden och arrayen
     errors = [];
     errorList.innerHTML = "";
     
-    //Variabel som kolla efter fel
+    //Variabel som kollar efter fel
     let validate = true;
 
     //Validera de tre olika fälten
@@ -94,24 +96,30 @@ function displayErrors() {
 }
 
 //Skapar ett studentkort och visar det på sidan
-function createStudentCard() {
+function createStudentCard(fullname, email, phone) {
 
+    //Läsa in font-värdet
     const font = fontSelect.value;
-    font.style.fontFamily = font;
 
     //Uppdatera studentkortet
     previewFullname.innerHTML = `Namn: ${fullname}`
     previewEmail.innerHTML = `E-post: ${email}`
     previewPhone.innerHTML = `Telefon: ${phone}`
 
-    //Studentkort som ett objekt som ska läggas in i historiken
+    //Lägga in style på preview-elementen
+    previewFullname.style.fontFamily = font;
+    previewEmail.style.fontFamily = font;
+    previewPhone.style.fontFamily = font;
+
+    //Studentkort som ett objekt läggs in i historiken
     const studentCard = {
         fullname: fullname,
         email: email,
         phone: phone,
-        fontSelect: font
+        font: font
     }
 
+    //Studentkort läggs överst i historiken
     history.unshift(studentCard);
 
     saveHistory();
@@ -119,51 +127,25 @@ function createStudentCard() {
     loadHistory();
 }
 
-
-
 //Sparar historiken i localStorage.
 function saveHistory() {
-    // Spara historik i localStorage
-    const studentsJson = JSON.stringify(students);
+    // Spara historik i localStorage genom omvandling till JSON
+    const studentsJson = JSON.stringify(history);
     localStorage.setItem("students", studentsJson);
-
-    const localStorageData = localStorage.getItem("students");
-
-    const students = JSON.parse(localStorageData);
-    if(students === null) {
-        students = [];
-    }
-    students.push(studentCard)
 }
-
-
 
 //Läser in tidigare historik från localStorage.
 function loadHistory() {
     // Hämta eventuell sparad historik
     const localStorageData = localStorage.getItem("students");
     
-    //Hämta data från localStorage
-    const students = JSON.parse(localStorageData);
-    
     //Om data inte finns, gör en ny array
-    if(students === null) {
-        students = [];
-    }
-
-    // Uppdatera historik
-    for(let i = 0; i < students.length; i++) {
-        const sectionEl = document.createElement("section");
-
-        const pEl = dokument.createElement("p");
-        pEl.innerHTML = `Namn: ${students[i].fullname}
-        <br>
-        E-post: ${students[i].email}
-        <br>
-        Telefon: ${students[i].phone}`;
-
-        sectionEl.appendChild(pEl);
-        historySection.appendChild(sectionEl);
+    if(localStorageData === null) {
+        history = [];
+    } else {
+    //Hämta data från localStorage och omvandla till JavaScript igen
+    history = JSON.parse(localStorageData);
+    renderHistory();    
     }
 }
 
@@ -171,11 +153,30 @@ function loadHistory() {
 function renderHistory() {
     // Rensa tidigare visad historik
     historySection.innerHTML = "";
-    // Skriv ut innehållet i history till DOM
+
+    //Lägg i värden som finns i history[] som en historik på sidan
+    for(let i = 0; i < history.length; i++) {
+        //Section ska innehålla alla insamlade värden från alla personer
+        const sectionEl = document.createElement("section");
+
+        //Värdena ska förvaras i nytt element "p" och tillhöra en person per element
+        const pEl = document.createElement("p");
+        pEl.innerHTML = `Namn: ${history[i].fullname}
+        <br>
+        E-post: ${history[i].email}
+        <br>
+        Telefon: ${history[i].phone}
+        <br>
+        Typsnitt: ${history[i].font}`;
+
+        //pEl ska ingå i sectionEl
+        sectionEl.appendChild(pEl);
+        //sectionEl ska ingå i historySection
+        historySection.appendChild(sectionEl);
+    }
 }
 
-
-// Rensar formulär, aktuellt studentkort och felmeddelanden.
+// Rensar formulär, aktuellt studentkort och felmeddelanden
 function clearForm() {
 
     errors = [];
@@ -186,28 +187,13 @@ function clearForm() {
     
 }
 
-/**
- * Raderar hela historiken.
- */
+//Raderar hela historiken
 function deleteHistory() {
     // Radera sparad historik
-/*     historySection.innerHTML = ""; */
-    // Uppdatera history och visningen på sidan
+    localStorage.removeItem("students");
+    history =[];
+    historySection.innerHTML = "";
 }
 
-
-// Eventlyssnare
-
-// När formuläret skickas:
-// - validera inmatningen
-// - skapa studentkort om valideringen lyckas
-
-
-// När användaren klickar på "Rensa"
-
-
-// När användaren klickar på "Radera historik"
-
-
-// När sidan laddas:
-// - läs in och visa eventuell tidigare historik
+//Ladda om historiken så den visas på sidan när sidan laddas om
+loadHistory();
