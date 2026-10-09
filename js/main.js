@@ -28,6 +28,9 @@ deleteHistoryButton.addEventListener("click", deleteHistory)
 // Array som används för felmeddelanden
 let errors = [];
 
+//Array som används för historiken
+let history = [];
+
 //Eventlyssnaren för formuläret
 function onSubmit(event) {
     event.preventDefault();
@@ -38,10 +41,10 @@ function onSubmit(event) {
     const phone = phoneInput.value.trim();
 
     //Om formuläret inte fyllts i korrekt ska felmeddelanden visas
-    //annars skapas studentkortet och formuläret rensas
     if(!validateForm(fullname, email, phone)) {
         displayErrors();
     } else {
+        //annars skapas studentkortet och formuläret rensas
         createStudentCard(fullname, email, phone);
         clearForm();
     }
@@ -54,7 +57,7 @@ function validateForm(fullname, email, phone) {
     errors = [];
     errorList.innerHTML = "";
     
-    //Variabel som kolla efter fel
+    //Variabel som kollar efter fel
     let validate = true;
 
     //Validera de tre olika fälten
@@ -108,7 +111,7 @@ function createStudentCard(fullname, email, phone) {
     previewEmail.style.fontFamily = font;
     previewPhone.style.fontFamily = font;
 
-    //Studentkort som ett objekt som ska läggas in i historiken
+    //Studentkort som ett objekt läggs in i historiken
     const studentCard = {
         fullname: fullname,
         email: email,
@@ -116,9 +119,7 @@ function createStudentCard(fullname, email, phone) {
         font: font
     }
 
-    //Array som används för historiken
-    let history = [];
-
+    //Studentkort läggs överst i historiken
     history.unshift(studentCard);
 
     saveHistory();
@@ -127,28 +128,25 @@ function createStudentCard(fullname, email, phone) {
 }
 
 //Sparar historiken i localStorage.
-function saveHistory(history) {
-    // Spara historik i localStorage
+function saveHistory() {
+    // Spara historik i localStorage genom omvandling till JSON
     const studentsJson = JSON.stringify(history);
     localStorage.setItem("students", studentsJson);
 }
 
-
-
 //Läser in tidigare historik från localStorage.
-function loadHistory(history) {
+function loadHistory() {
     // Hämta eventuell sparad historik
     const localStorageData = localStorage.getItem("students");
     
-    //Hämta data från localStorage
-    const history = JSON.parse(localStorageData);
-    
     //Om data inte finns, gör en ny array
-    if(history === null) {
+    if(localStorageData === null) {
         history = [];
+    } else {
+    //Hämta data från localStorage och omvandla till JavaScript igen
+    history = JSON.parse(localStorageData);
+    renderHistory();    
     }
-
-    renderHistory();
 }
 
 // Visar historiken på sidan.
@@ -156,10 +154,12 @@ function renderHistory() {
     // Rensa tidigare visad historik
     historySection.innerHTML = "";
 
-    // Uppdatera historik
+    //Lägg i värden som finns i history[] som en historik på sidan
     for(let i = 0; i < history.length; i++) {
+        //Section ska innehålla alla insamlade värden från alla personer
         const sectionEl = document.createElement("section");
 
+        //Värdena ska förvaras i nytt element "p" och tillhöra en person per element
         const pEl = document.createElement("p");
         pEl.innerHTML = `Namn: ${history[i].fullname}
         <br>
@@ -169,11 +169,12 @@ function renderHistory() {
         <br>
         Typsnitt: ${history[i].font}`;
 
+        //pEl ska ingå i sectionEl
         sectionEl.appendChild(pEl);
+        //sectionEl ska ingå i historySection
         historySection.appendChild(sectionEl);
     }
 }
-
 
 // Rensar formulär, aktuellt studentkort och felmeddelanden
 function clearForm() {
@@ -186,14 +187,13 @@ function clearForm() {
     
 }
 
-
 //Raderar hela historiken
-function deleteHistory(history) {
+function deleteHistory() {
     // Radera sparad historik
     localStorage.removeItem("students");
     history =[];
     historySection.innerHTML = "";
-    // Uppdatera history och visningen på sidan
 }
 
+//Ladda om historiken så den visas på sidan när sidan laddas om
 loadHistory();
